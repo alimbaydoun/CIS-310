@@ -1,60 +1,48 @@
 INCLUDE Irvine32.inc
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess proto,dwExitCode:dword
 
 .data
-grade BYTE ?,0
-grA BYTE "A",0
-grB BYTE "B",0
-grC BYTE "C",0
-grD BYTE "D",0
-grF BYTE "F",0
-out_of_range BYTE "The integer is not <= 100 and >= 0",0
+str_prompt BYTE "Score = ", 0
+
+str_A BYTE "Grade = A", 0
+str_B BYTE "Grade = B", 0
+str_C BYTE "Grade = C", 0
+str_D BYTE "Grade = D", 0
+str_E BYTE "Grade = E", 0
+
+str_Score BYTE "Score = ", 0
+str_Grade BYTE "Grade = ", 0
+
 
 .code
-main PROC
-call Randomize
-mov ecx,10
-L1:
-mov eax,51
-call RandomRange
-add eax,50
-call GradeCalc
-mov edx,0
-mov grade,al
-mov edx, OFFSET grade
+main proc
+
+mov edx, offset str_Prompt
 call WriteString
-call Crlf
-loop L1
-exit
-
-main ENDP
-
-GradeCalc PROC
-.IF (eax <= 100 && eax >= 0)
-.IF (eax <= 100) && (eax > 89)
-
-mov al,grA
-.ELSEIF (eax < 90) && (eax > 79)
-
-mov al,grB
-.ELSEIF (eax < 80) && (eax > 69)
-
-mov al,grC
-.ELSEIF (eax < 70) && (eax > 59)
-
-mov al,grD
-.ELSE
-
-mov al,grF
-.ENDIF
-.ELSE
-
-mov edx,OFFSET out_of_range
+call ReadDec
+mov edx, offset str_Score
 call WriteString
-call Crlf
+call WriteDec
 
-ret
+.IF eax >= 90
+mov edx, offset str_A
+.ELSEIF eax >= 80
+mov edx, offset str_B
+.ELSEIF eax >= 70
+mov edx, offset str_C
+.ELSEIF eax >= 60
+mov edx, offset str_D
+.ELSE
+mov edx, offset str_E
 .ENDIF
 
-ret
-GradeCalc ENDP
-END main
+call Crlf
+call WriteString
+
+invoke ExitProcess,0
+
+main endp
+end main
